@@ -1,38 +1,30 @@
-from flask import Blueprint, request, jsonify
-from app.models import db, Job
-from app.utils import token_required
+# app/routes/jobs.py
+from flask import Blueprint, jsonify, request
+from app.models import Job
 
 jobs_bp = Blueprint('jobs', __name__)
 
-@jobs_bp.route('/jobs', methods=['POST'])
-@token_required
-def create_job(current_user):
-    if current_user.role != 'recruiter':
-        return jsonify({'message': 'Seuls les recruteurs peuvent créer une offre'}), 403
+@jobs_bp.route('/', methods=['GET'])  # <- ajoute bien le slash ici
+def get_jobs():
+    keyword = request.args.get('keyword', '').lower()
+    location = request.args.get('location', '').lower()
 
-    data = request.get_json()
-    new_job = Job(
-        title=data.get('title'),
-        description=data.get('description'),
-        location=data.get('location'),
-        skills=data.get('skills'),
-        recruiter_id=current_user.id
-    )
-    db.session.add(new_job)
-    db.session.commit()
-    return jsonify({'message': 'Offre créée avec succès'}), 201
-
-@jobs_bp.route('/jobs', methods=['GET'])
-@token_required
-def list_jobs(current_user):
     jobs = Job.query.all()
-    return jsonify([
-        {
-            'id': job.id,
-            'title': job.title,
-            'description': job.description,
-            'location': job.location,
-            'skills': job.skills,
-            'recruiter_id': job.recruiter_id
-        } for job in jobs
-    ])
+    filtered = []
+
+    for job in jobs:
+        if keyword in job.title.lower() or keyword in job.description.lower():
+            if location in job.location.lower():
+                filtered.append(job)
+
+    return jsonify({
+        "jobs": [
+            {
+                "id": job.id,
+                "title": job.title,
+                "description": job.description,
+                "location": job.location,
+                "skills": job.skills,
+            } for job in filtered
+        ]
+    })

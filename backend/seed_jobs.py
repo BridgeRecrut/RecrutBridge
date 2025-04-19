@@ -1,23 +1,26 @@
-# seed_jobs.py
-
-from app import app
-from app.models import db, Job, User
+from app import app, db
+from app.models import User, Job
 
 with app.app_context():
-    recruiter = User.query.filter_by(role='recruiter').first()
-
+    # Vérifie s'il y a déjà un recruteur
+    recruiter = User.query.filter_by(email="recruteur@example.com").first()
     if not recruiter:
-        recruiter = User(email='recruteur@example.com', password='test123', role='recruiter')
+        recruiter = User(
+            email="recruteur@example.com",
+            password="hashed-password",  # Remplace ça par un hash réel si tu fais login
+            role="recruiter"
+        )
         db.session.add(recruiter)
         db.session.commit()
         print("👤 Recruteur créé avec l'email: recruteur@example.com")
 
+    # Crée des offres
     jobs = [
-        Job(title="Développeur Full Stack", description="Développement frontend/backend", location="Paris", skills="React, Node.js", recruiter_id=recruiter.id),
-        Job(title="UX/UI Designer", description="Conception de maquettes web", location="Lyon", skills="Figma, UX research", recruiter_id=recruiter.id),
-        Job(title="DevOps Engineer", description="CI/CD, infrastructure cloud", location="Remote", skills="Docker, Kubernetes, AWS", recruiter_id=recruiter.id),
-        Job(title="Développeur Python", description="Développement backend avec Flask", location="Marseille", skills="Python, Flask", recruiter_id=recruiter.id),
-        Job(title="Chef de Projet IT", description="Gestion de projet agile", location="Bordeaux", skills="Scrum, Jira", recruiter_id=recruiter.id),
+        Job(title="Développeur React", description="Frontend moderne avec React", location="Paris", skills="React, JS", recruiter_id=recruiter.id),
+        Job(title="Data Scientist", description="Analyse des données massives", location="Lyon", skills="Python, Machine Learning", recruiter_id=recruiter.id),
+        Job(title="DevOps Engineer", description="CI/CD, Docker, AWS", location="Remote", skills="Docker, Kubernetes", recruiter_id=recruiter.id),
+        Job(title="UX/UI Designer", description="Design d'interfaces web", location="Marseille", skills="Figma, UI/UX", recruiter_id=recruiter.id),
+        Job(title="Développeur Backend", description="API REST avec Flask", location="Toulouse", skills="Flask, SQLAlchemy", recruiter_id=recruiter.id),
     ]
 
     db.session.add_all(jobs)

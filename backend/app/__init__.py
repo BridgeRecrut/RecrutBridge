@@ -23,10 +23,9 @@ def create_app():
     from app.routes import auth, jobs, profile, apply, match
 
     app.register_blueprint(auth.auth_bp)
-    app.register_blueprint(jobs.jobs_bp)
+    app.register_blueprint(jobs.jobs_bp, url_prefix="/jobs")  # optionnel mais bon pour clarté
     app.register_blueprint(profile.profile_bp)
     app.register_blueprint(apply.apply_bp)
     app.register_blueprint(match.match_bp)
 
     return app
-app = create_app()

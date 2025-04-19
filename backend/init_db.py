@@ -1,7 +1,6 @@
-from app import create_app, db
-
-app = create_app()
+from app import app
+from app import db
 
 with app.app_context():
     db.create_all()
-    print("✅ Base de données initialisée avec succès.")
+    print("✅ Base de données initialisée.")
